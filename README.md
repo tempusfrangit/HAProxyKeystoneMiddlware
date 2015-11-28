@@ -61,3 +61,5 @@ My Example configuration for HAProxy is as follows with the two lua files in `/e
         mode http
         server web01 127.0.0.1:8000
 
+
+The json.lua is vendored from http://regex.info/blog/lua/json and is licensed under Creative Commons.
