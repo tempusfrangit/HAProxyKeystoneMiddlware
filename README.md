@@ -11,7 +11,7 @@ file. Obviously this is only working for contrived authentication at the moment
 (devstack-y) and you'll need to modifiy the code to auth correctly with your
 site.
 
-My Example configuration for HAProxy is as follows:
+My Example configuration for HAProxy is as follows with the two lua files in `/etc/haproxy`:
 
     global
         log /dev/log	local0
