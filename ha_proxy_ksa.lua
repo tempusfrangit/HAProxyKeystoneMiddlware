@@ -71,7 +71,7 @@ local keystone_headers_arr = {
 }
 
 function strip_headers(txn)
-    for header,_ in pairs(keystone_headers_arr) do
+    for _,header in pairs(keystone_headers_arr) do
         txn.http:req_del_header(header)
     end
 end
