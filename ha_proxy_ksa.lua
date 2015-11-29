@@ -68,6 +68,7 @@ local keystone_headers_arr = {
     "X-User-Name",
     "X-Roles",
     "X-Service-Catalog",
+    "KSM-Secure-Request",
 }
 
 function strip_headers(txn)
@@ -144,12 +145,19 @@ end
 
 function extract_and_apply_authenticated_headers(txn, auth_token, decoded_body)
     local token_data = decoded_body["token"]
+
+    -- Super dooper seeeeecret password for validating request at the service
+    -- keystonemiddleware
+    txn.http:req_add_header("KSM-Secure-Request", "SoVerySecure")
+
     txn.http:req_add_header("X-Identity-Status", "Confirmed")
     txn.http:req_add_header("X-Auth-Token", auth_token)
 
     if token_data["project"] ~= nil then
         txn.http:req_add_header("X-Project-Id", token_data["project"]["id"])
         txn.http:req_add_header("X-Project-Name", token_data["project"]["name"])
+        txn.http:req_add_header("X-Tenant-Id", token_data["project"]["id"])
+        txn.http:req_add_header("X-Tenant-Name", token_data["project"]["name"])
     end
 
     txn.http:req_add_header("X-User-Id", token_data["user"]["id"])
@@ -160,11 +168,9 @@ function extract_and_apply_authenticated_headers(txn, auth_token, decoded_body)
         table.insert(role_list, role["name"])
     end
 
-    if role_list ~= nil then
-        txn.http:req_add_header("X-Roles", table.concat(role_list, ","))
-    else
-        txn.http:req_add_header("X-Roles", "")
-    end
+    role_list = table.concat(role_list, ",")
+    txn.http:req_add_header("X-Roles", role_list)
+    txn.http:req_add_header("X-Role", role_list)
 
     if token_data["catalog"] ~= nil then
         txn.http:req_add_header("X-Service-Catalog",
